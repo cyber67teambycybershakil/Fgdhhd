@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIDEO BOX - ভিডিও ও ছবির সংগ্রহ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Noto Sans Bengali', sans-serif;
+    background: #0f0f13;
+    color: #eee;
+    line-height: 1.6;
+  }
+
+  header {
+    background: linear-gradient(135deg, #e50914, #b20710);
+    padding: 22px 15px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(229,9,20,0.45);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-size: 32px;
+    letter-spacing: 3px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  header p {
+    color: #ffe0e0;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 15px 60px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    margin: 40px 0 20px;
+    padding-left: 12px;
+    border-left: 5px solid #e50914;
+    color: #fff;
+  }
+
+  /* ---------------- ভিডিও গ্রিড ---------------- */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+  }
+
+  .video-card {
+    background: #1a1a22;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    transition: transform .3s, box-shadow .3s;
+  }
+
+  .video-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(229,9,20,0.35);
+  }
+
+  /* iframe-এর অনুপাত ঠিক রাখার জন্য রেসপন্সিভ wrapper */
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 ডিফল্ট */
+  }
+
+  .video-wrap.portrait-9x16 { padding-top: 177.78%; }  /* 9:16 */
+  .video-wrap.portrait-3x4 { padding-top: 133.33%; }   /* 3:4 */
+
+  .video-wrap iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  .video-info {
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #bbb;
+    font-weight: 600;
+  }
+
+  /* ---------------- ছবির গ্যালারি ---------------- */
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .image-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1a1a22;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    transition: transform .3s, box-shadow .3s;
+    cursor: pointer;
+  }
+
+  .image-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 30px rgba(229,9,20,0.35);
+  }
+
+  .image-card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+    transition: opacity .3s;
+  }
+
+  .image-card:hover img { opacity: .88; }
+
+  /* ---------------- ফুটার ---------------- */
+  footer {
+    text-align: center;
+    padding: 25px 15px;
+    background: #0a0a0d;
+    color: #666;
+    font-size: 14px;
+    border-top: 1px solid #222;
+  }
+
+  footer strong { color: #e50914; }
+
+  /* ---------------- লাইটবক্স (ছবি বড় করে দেখা) ---------------- */
+  .lightbox {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox img {
+    max-width: 95%;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 0 40px rgba(229,9,20,0.5);
+  }
+
+  .lightbox .close-btn {
+    position: absolute;
+    top: 20px; right: 30px;
+    font-size: 45px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+    transition: color .2s;
+  }
+
+  .lightbox .close-btn:hover { color: #e50914; }
+
+  @media (max-width: 500px) {
+    header h1 { font-size: 24px; }
+    .section-title { font-size: 18px; }
+    .image-card img { height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 VIDEO BOX</h1>
+  <p>ভিডিও ও ছবির সেরা সংগ্রহ</p>
+</header>
+
+<div class="container">
+
+  <!-- ================= ভিডিও সেকশন ================= -->
+  <h2 class="section-title">ভিডিও সমূহ</h2>
+
+  <div class="video-grid">
+
+    <!-- ভিডিও ১ : পোর্ট্রেট ৯:১৬ -->
+    <div class="video-card">
+      <div class="video-wrap portrait-9x16">
+        <iframe src="https://vewo.io/embed/acced67d71fb"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                title="vewo video player"></iframe>
+      </div>
+      <div class="video-info">ভিডিও #১</div>
+    </div>
+
+    <!-- ভিডিও ২ : ল্যান্ডস্কেপ ১৬:৯ -->
+    <div class="video-card">
+      <div class="video-wrap">
+        <iframe src="https://vewo.io/embed/a5b1804bdbbe"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                title="vewo video player"></iframe>
+      </div>
+      <div class="video-info">ভিডিও #২</div>
+    </div>
+
+    <!-- ভিডিও ৩ : পোর্ট্রেট ৩:৪ -->
+    <div class="video-card">
+      <div class="video-wrap portrait-3x4">
+        <iframe src="https://vewo.io/embed/dc20d9b78210"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                title="vewo video player"></iframe>
+      </div>
+      <div class="video-info">ভিডিও #৩</div>
+    </div>
+
+  </div>
+
+  <!-- ================= ছবির সেকশন ================= -->
+  <h2 class="section-title">ছবির গ্যালারি</h2>
+
+  <div class="image-grid">
+    <div class="image-card" onclick="openLightbox('https://i.ibb.co.com/YKWF8Jd/IMG-20261107-142225-142.jpg')">
+      <img src="https://i.ibb.co.com/YKWF8Jd/IMG-20261107-142225-142.jpg" alt="ছবি ১">
+    </div>
+
+    <div class="image-card" onclick="openLightbox('https://i.ibb.co.com/rKR1rRRR/IMG-20261107-150439-431.jpg')">
+      <img src="https://i.ibb.co.com/rKR1rRRR/IMG-20261107-150439-431.jpg" alt="ছবি ২">
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 <strong>VIDEO BOX</strong> — সর্বস্বত্ব সংরক্ষিত
+</footer>
+
+<!-- লাইটবক্স -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <span class="close-btn" onclick="closeLightbox(event)">&times;</span>
+  <img id="lightbox-img" src="" alt="বড় ছবি">
+</div>
+
+<script>
+  /* ==========================================================
+     ১) মনিটাইজেশন লিংক : ভিডিও দেখার (প্লে করার) আগে ওপেন হবে
+     ========================================================== */
+  const MONETIZATION_URL = "https://uplcm.com/4/11368576";
+  const openedOnce = new WeakSet(); // প্রতি iframe-এ একবার করে লিংক ওপেন হবে
+
+  document.querySelectorAll('.video-wrap iframe').forEach(function (frame) {
+    // iframe-এ ক্লিক/টাচ হলে (অর্থাৎ ভিডিও প্লে করতে চাইলে)
+    frame.addEventListener('click', function () {
+      if (!openedOnce.has(frame)) {
+        openedOnce.add(frame);
+        window.open(MONETIZATION_URL, '_blank');
+      }
+    });
+
+    // মোবাইলে touch ইভেন্ট
+    frame.addEventListener('touchstart', function () {
+      if (!openedOnce.has(frame)) {
+        openedOnce.add(frame);
+        window.open(MONETIZATION_URL, '_blank');
+      }
+    }, { passive: true });
+  });
+
+  /* ==========================================================
+     ২) লাইটবক্স : ছবি বড় করে দেখা
+     ========================================================== */
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('active');
+  }
+
+  function closeLightbox(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('lightbox').classList.remove('active');
+  }
+
+  // Esc চাপলে বন্ধ
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+</script>
+
+</body>
+</html>
