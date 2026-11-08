@@ -78,6 +78,7 @@
     position: relative;
     width: 100%;
     padding-top: 56.25%; /* 16:9 ডিফল্ট */
+    cursor: pointer;
   }
 
   .video-wrap.portrait-9x16 { padding-top: 177.78%; }  /* 9:16 */
@@ -89,6 +90,37 @@
     width: 100% !important;
     height: 100% !important;
     border: 0;
+  }
+
+  /* ---------------- ভিডিও গেট (ওভারলে) ---------------- */
+  .video-gate {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    z-index: 10;
+    transition: background .3s;
+  }
+
+  .video-gate:hover { background: rgba(229, 9, 20, 0.85); }
+
+  .play-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+  }
+
+  .video-gate span {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 10px;
+    text-align: center;
   }
 
   .video-info {
@@ -180,6 +212,7 @@
     header h1 { font-size: 24px; }
     .section-title { font-size: 18px; }
     .image-card img { height: 220px; }
+    .play-icon { font-size: 48px; }
   }
 </style>
 </head>
@@ -200,11 +233,16 @@
     <!-- ভিডিও ১ : পোর্ট্রেট ৯:১৬ -->
     <div class="video-card">
       <div class="video-wrap portrait-9x16">
-        <iframe src="https://vewo.io/embed/acced67d71fb"
+        <iframe class="lazy-video"
+                data-src="https://vewo.io/embed/acced67d71fb"
                 frameborder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowfullscreen
                 title="vewo video player"></iframe>
+        <div class="video-gate">
+          <div class="play-icon">▶</div>
+          <span>ভিডিও দেখতে ক্লিক করুন</span>
+        </div>
       </div>
       <div class="video-info">ভিডিও #১</div>
     </div>
@@ -212,11 +250,16 @@
     <!-- ভিডিও ২ : ল্যান্ডস্কেপ ১৬:৯ -->
     <div class="video-card">
       <div class="video-wrap">
-        <iframe src="https://vewo.io/embed/a5b1804bdbbe"
+        <iframe class="lazy-video"
+                data-src="https://vewo.io/embed/a5b1804bdbbe"
                 frameborder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowfullscreen
                 title="vewo video player"></iframe>
+        <div class="video-gate">
+          <div class="play-icon">▶</div>
+          <span>ভিডিও দেখতে ক্লিক করুন</span>
+        </div>
       </div>
       <div class="video-info">ভিডিও #২</div>
     </div>
@@ -224,11 +267,16 @@
     <!-- ভিডিও ৩ : পোর্ট্রেট ৩:৪ -->
     <div class="video-card">
       <div class="video-wrap portrait-3x4">
-        <iframe src="https://vewo.io/embed/dc20d9b78210"
+        <iframe class="lazy-video"
+                data-src="https://vewo.io/embed/dc20d9b78210"
                 frameborder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowfullscreen
                 title="vewo video player"></iframe>
+        <div class="video-gate">
+          <div class="play-icon">▶</div>
+          <span>ভিডিও দেখতে ক্লিক করুন</span>
+        </div>
       </div>
       <div class="video-info">ভিডিও #৩</div>
     </div>
@@ -262,27 +310,30 @@
 
 <script>
   /* ==========================================================
-     ১) মনিটাইজেশন লিংক : ভিডিও দেখার (প্লে করার) আগে ওপেন হবে
+     ১) মনিটাইজেশন লিংক : গেট ক্লিক করলে অ্যাড ওপেন হবে,
+        তারপর ভিডিও লোড হবে
      ========================================================== */
   const MONETIZATION_URL = "https://uplcm.com/4/11368576";
-  const openedOnce = new WeakSet(); // প্রতি iframe-এ একবার করে লিংক ওপেন হবে
 
-  document.querySelectorAll('.video-wrap iframe').forEach(function (frame) {
-    // iframe-এ ক্লিক/টাচ হলে (অর্থাৎ ভিডিও প্লে করতে চাইলে)
-    frame.addEventListener('click', function () {
-      if (!openedOnce.has(frame)) {
-        openedOnce.add(frame);
-        window.open(MONETIZATION_URL, '_blank');
+  document.querySelectorAll('.video-gate').forEach(function (gate) {
+    gate.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const wrap = gate.closest('.video-wrap');
+      const iframe = wrap.querySelector('.lazy-video');
+
+      // ১) অ্যাড লিংক নতুন ট্যাবে খুলুন
+      window.open(MONETIZATION_URL, '_blank');
+
+      // ২) iframe-এর src সেট করুন (ভিডিও লোড হবে)
+      if (iframe && !iframe.getAttribute('src')) {
+        iframe.setAttribute('src', iframe.getAttribute('data-src'));
       }
+
+      // ৩) গেট সরিয়ে দিন
+      gate.style.display = 'none';
     });
-
-    // মোবাইলে touch ইভেন্ট
-    frame.addEventListener('touchstart', function () {
-      if (!openedOnce.has(frame)) {
-        openedOnce.add(frame);
-        window.open(MONETIZATION_URL, '_blank');
-      }
-    }, { passive: true });
   });
 
   /* ==========================================================
