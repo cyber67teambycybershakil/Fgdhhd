@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIDEO BOX - ভিডিও ও ছবির সংগ্রহ</title>
+
+<!-- Monetag সাইট যাচাইকরণ মেটা ট্যাগ -->
+<meta name="monetag" content="d08bc3d1a10693fe3d3709a725afe336">
+
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -53,7 +57,6 @@
     color: #fff;
   }
 
-  /* ---------------- ভিডিও গ্রিড ---------------- */
   .video-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -73,16 +76,15 @@
     box-shadow: 0 12px 30px rgba(229,9,20,0.35);
   }
 
-  /* iframe-এর অনুপাত ঠিক রাখার জন্য রেসপন্সিভ wrapper */
   .video-wrap {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 ডিফল্ট */
+    padding-top: 56.25%;
     cursor: pointer;
   }
 
-  .video-wrap.portrait-9x16 { padding-top: 177.78%; }  /* 9:16 */
-  .video-wrap.portrait-3x4 { padding-top: 133.33%; }   /* 3:4 */
+  .video-wrap.portrait-9x16 { padding-top: 177.78%; }
+  .video-wrap.portrait-3x4 { padding-top: 133.33%; }
 
   .video-wrap iframe {
     position: absolute;
@@ -92,7 +94,6 @@
     border: 0;
   }
 
-  /* ---------------- ভিডিও গেট (ওভারলে) ---------------- */
   .video-gate {
     position: absolute;
     top: 0; left: 0;
@@ -130,7 +131,6 @@
     font-weight: 600;
   }
 
-  /* ---------------- ছবির গ্যালারি ---------------- */
   .image-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -161,7 +161,6 @@
 
   .image-card:hover img { opacity: .88; }
 
-  /* ---------------- ফুটার ---------------- */
   footer {
     text-align: center;
     padding: 25px 15px;
@@ -173,7 +172,6 @@
 
   footer strong { color: #e50914; }
 
-  /* ---------------- লাইটবক্স (ছবি বড় করে দেখা) ---------------- */
   .lightbox {
     display: none;
     position: fixed;
@@ -225,7 +223,6 @@
 
 <div class="container">
 
-  <!-- ================= ভিডিও সেকশন ================= -->
   <h2 class="section-title">ভিডিও সমূহ</h2>
 
   <div class="video-grid">
@@ -283,7 +280,6 @@
 
   </div>
 
-  <!-- ================= ছবির সেকশন ================= -->
   <h2 class="section-title">ছবির গ্যালারি</h2>
 
   <div class="image-grid">
@@ -302,17 +298,12 @@
   © 2026 <strong>VIDEO BOX</strong> — সর্বস্বত্ব সংরক্ষিত
 </footer>
 
-<!-- লাইটবক্স -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
   <span class="close-btn" onclick="closeLightbox(event)">&times;</span>
   <img id="lightbox-img" src="" alt="বড় ছবি">
 </div>
 
 <script>
-  /* ==========================================================
-     ১) মনিটাইজেশন লিংক : গেট ক্লিক করলে অ্যাড ওপেন হবে,
-        তারপর ভিডিও লোড হবে
-     ========================================================== */
   const MONETIZATION_URL = "https://uplcm.com/4/11368576";
 
   document.querySelectorAll('.video-gate').forEach(function (gate) {
@@ -323,22 +314,16 @@
       const wrap = gate.closest('.video-wrap');
       const iframe = wrap.querySelector('.lazy-video');
 
-      // ১) অ্যাড লিংক নতুন ট্যাবে খুলুন
       window.open(MONETIZATION_URL, '_blank');
 
-      // ২) iframe-এর src সেট করুন (ভিডিও লোড হবে)
       if (iframe && !iframe.getAttribute('src')) {
         iframe.setAttribute('src', iframe.getAttribute('data-src'));
       }
 
-      // ৩) গেট সরিয়ে দিন
       gate.style.display = 'none';
     });
   });
 
-  /* ==========================================================
-     ২) লাইটবক্স : ছবি বড় করে দেখা
-     ========================================================== */
   function openLightbox(src) {
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.add('active');
@@ -349,7 +334,6 @@
     document.getElementById('lightbox').classList.remove('active');
   }
 
-  // Esc চাপলে বন্ধ
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeLightbox();
   });
